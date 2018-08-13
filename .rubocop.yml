@@ -1,0 +1,269 @@
+AllCops:
+  Include:
+    - '**/Gemfile'
+    - '**/Rakefile'
+  Exclude:
+    - 'vendor/**/*'
+    - 'config/**/*'
+    - 'bin/*'
+    - 'tmp/**/*'
+    - "db/schema.rb"
+  UseCache: true
+  CacheRootDirectory: ./tmp
+  TargetRubyVersion: 2.5
+
+# rspec の `expect { hoge }` などが対象となり邪魔なので無効にする。
+#
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Lint/AmbiguousBlockAssociation
+#
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
+
+# true と比較することなんてないし `return unless x = exp` な感じで条件式でも代入したいので無効にする。
+#
+# `AllowSafeAssignment: true` を設定すれば `if (x = 10)` を受け入れてくれる様だけど、読みやすい気がしないしやめておく。
+#
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Lint/AssignmentInCondition
+#
+Lint/AssignmentInCondition:
+  Enabled: false
+
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Metrics/AbcSize
+#
+Metrics/AbcSize:
+  Max: 20
+
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Metrics/BlockNesting
+#
+Metrics/BlockNesting:
+  Max: 3
+
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Metrics/ClassLength
+#
+Metrics/ClassLength:
+  CountComments: false
+  Max: 200
+
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Metrics/ModuleLength
+#
+Metrics/ModuleLength:
+  CountComments: false
+  Max: 200
+
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Metrics/CyclomaticComplexity
+#
+Metrics/CyclomaticComplexity:
+  Max: 6
+
+# 128 文字程度にしておく。
+#
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Metrics/LineLength
+#
+Metrics/LineLength:
+  Max: 128
+  AllowURI: true
+  URISchemes:
+    - http
+    - https
+  Exclude:
+    - 'spec/**/*'
+    - "db/migrate/*.rb"
+
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Metrics/MethodLength
+#
+Metrics/MethodLength:
+  CountComments: false
+  Max: 20
+  Exclude:
+    - "db/migrate/*.rb"
+
+# @see https://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Metrics/BlockLength
+#
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Metrics/ParameterLists
+#
+Metrics/ParameterLists:
+  Max: 5
+  CountKeywordArgs: false
+
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Metrics/PerceivedComplexity
+#
+Metrics/PerceivedComplexity:
+  Max: 7
+
+# @see https://rubocop.readthedocs.io/en/latest/cops_naming/#naminguncommunicativemethodparamname
+#
+Naming/UncommunicativeMethodParamName:
+  MinNameLength: 1
+
+# 主にテストコードで使う連番変数。棚上げするため無効にしておく。
+#
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Naming/VariableNumber
+#
+Naming/VariableNumber:
+  Enabled: false
+
+# 日本語を使いたいので無効にする。
+#
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/AsciiComments
+#
+Style/AsciiComments:
+  Enabled: false
+
+# 基本的にブロックコメントは不要だと思うけど、rspec のジェネレータで作ったファイルには含まれている。これだけは許可しておく。
+#
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/BlockComments
+#
+Style/BlockComments:
+  Exclude:
+    - 'codedeploy/spec/spec_helper.rb'
+    - 'spec/spec_helper.rb'
+
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/BracesAroundHashParameters
+#
+Style/BracesAroundHashParameters:
+  EnforcedStyle: context_dependent
+  SupportedStyles:
+    - braces
+    - no_braces
+    - context_dependent
+
+# ドキュメンテーションは強制したい気持ちが出てきているけど、歴史的経緯もあるので Rubocop での強制は行わない。
+#
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/Documentation
+#
+Style/Documentation:
+  Enabled: false
+
+# `!!` は使いたいので無効にする。
+#
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/DoubleNegation
+#
+Style/DoubleNegation:
+  Enabled: false
+
+# `else` 節で `nil` を返す際は明確に `nil` と書きたいので empty スタイルを採用。
+#
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/EmptyElse
+#
+Style/EmptyElse:
+  EnforcedStyle: empty
+
+# expanded スタイルにしておく。
+#
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/EmptyMethod
+#
+Style/EmptyMethod:
+  EnforcedStyle: expanded
+
+# @see https://rubocop.readthedocs.io/en/latest/cops_style/#styleexpandpatharguments
+#
+Style/ExpandPathArguments:
+  Enabled: false
+
+# annotated スタイルが明示的で良さそうな気がしつつ、そこまで書き方を限定すべきか悩んだので unannotated にしておく。
+#
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/FormatStringToken
+#
+Style/FormatStringToken:
+  EnforcedStyle: unannotated
+
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/FrozenStringLiteralComment
+#
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# 1_000_000 と区切り文字が 2 個以上必要になる場合のみ _ 区切りを必須にする
+#
+# @see https://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/NumericLiterals
+Style/NumericLiterals:
+  MinDigits: 7
+
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/RescueStandardError
+#
+Style/RescueStandardError:
+  EnforcedStyle: implicit
+
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/SignalException
+#
+Style/SignalException:
+  Enabled: false
+
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/SymbolArray
+Style/SymbolArray:
+  Enabled: false
+
+# 統一するなら brackets スタイルが修正範囲が狭そうだけど、無理に揃えなくても分かりやすいかなと思ったので無効にしておく。
+#
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/TernaryParentheses
+#
+Style/TernaryParentheses:
+  Enabled: false
+
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/TrailingCommaInArguments
+#
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: consistent_comma
+
+# @see https://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/TrailingCommaInArrayLiteral
+#
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+
+# Factory_bot の sequence を使う際に、ダブルコーテーションに変数を入れると検査されるため
+
+# @see https://www.rubydoc.info/github/bbatsov/RuboCop/RuboCop/Cop/Style/UnneededInterpolation
+Style/UnneededInterpolation:
+  Exclude:
+    - 'spec/factories/*'
+
+##################### Rails ##################################
+
+Rails:
+  Enabled: true
+
+# デフォルトで記述されているパスも指摘されるため無効
+#
+# @see https://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Rails/FilePath
+Rails/FilePath:
+  Exclude:
+    - 'spec/*_helper.rb'
+
+# やんごとなき理由から dependent を付けない事があるので無効にしておく。
+#
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Rails/HasManyOrHasOneDependent
+#
+Rails/HasManyOrHasOneDependent:
+  Enabled: false
+
+# ステータスコードを番号で記述するため
+#
+# @see https://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Rails/HttpStatus
+Rails/HttpStatus:
+  Enabled: false
+
+# やんごとなき理由からバリデーションを回避することはよくあるので無効にする。
+#
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Rails/SkipsModelValidations
+#
+Rails/SkipsModelValidations:
+  Enabled: false
+
+# @see http://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Rails/Validation
+#
+Rails/Validation:
+  Enabled: false
+
+# 双方向の関連付けを明示する inverse_of は:throughオプション、:polymorphicオプション、:asオプションとの併用ができないため、アプリの仕様によってつけるかどうかを選択できるよう無効にしておく。
+#
+# @see https://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Rails/InverseOf
+# @see https://railsguides.jp/association_basics.html#%E5%8F%8C%E6%96%B9%E5%90%91%E9%96%A2%E9%80%A3%E4%BB%98%E3%81%91
+#
+Rails/InverseOf:
+  Enabled: false
