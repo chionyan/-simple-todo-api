@@ -34,10 +34,9 @@ RSpec.describe 'Todos', type: :request do
       expect(JSON.parse(response.body)[1]).to eq expect_todo_second
     end
 
-      it 'return valid JSON' do
-        subject
-        expect(JSON.parse(response.body)[1]).to eq expect_todo_result
-      end
+    it 'return 2 JSON' do
+      subject
+      expect(JSON.parse(response.body).count).to eq 2
     end
   end
 end
