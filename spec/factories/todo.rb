@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :todo do
-    sequence(:title) { |i| "title_#{i}" }
-    sequence(:text) { |i| "text_#{i}" }
+    title 'Sample title'
+    text 'Sample text'
   end
 end
