@@ -10,7 +10,7 @@ RSpec.describe 'Todos', type: :request do
         'id' => todo.id,
         'title' => todo.title,
         'text' => todo.text,
-        'created_at' => todo.created_at&.in_time_zone&.iso8601,
+        'created_at' => todo.created_at.iso8601,
       }
     end
 
