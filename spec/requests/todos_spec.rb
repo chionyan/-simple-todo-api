@@ -32,9 +32,11 @@ RSpec.describe 'Todos', type: :request do
       subject
       result_todos = JSON.parse(response.body)
 
-      expect(result_todos.count).to eq 2
-      expect(result_todos[0]).to eq expect_todo_first
-      expect(result_todos[1]).to eq expect_todo_second
+      aggregate_failures do
+        expect(result_todos.count).to eq 2
+        expect(result_todos[0]).to eq expect_todo_first
+        expect(result_todos[1]).to eq expect_todo_second
+      end
     end
   end
 end
