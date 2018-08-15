@@ -4,7 +4,7 @@ RSpec.describe 'Todos', type: :request do
   before { travel_to '2019-01-01T00:00:00Z' }
 
   describe 'GET /todos' do
-    subject { get todos_path }
+    subject { get '/todos' }
 
     let!(:todos) { create_list(:todo, 2) }
     let(:expect_todo_result) do
