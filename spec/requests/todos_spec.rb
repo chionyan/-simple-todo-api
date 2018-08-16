@@ -55,8 +55,10 @@ RSpec.describe 'Todos', type: :request do
       result_todo = JSON.parse(response.body)
 
       aggregate_failures do
+        expect(result_todo['id']).to_not be_empty
         expect(result_todo['title']).to eq 'Sample title'
         expect(result_todo['text']).to eq 'Sample text'
+        expect(result_todo['created_at']).to_not be_empty
       end
     end
 
