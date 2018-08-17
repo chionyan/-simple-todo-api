@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe 'Todos', type: :request do
-  before { travel_to '2019-01-01T00:00:00Z' }
-
   describe 'GET /todos' do
     subject { get '/todos' }
+
+    before { travel_to '2019-01-01T00:00:00Z' }
 
     let!(:todo_first) { create(:todo, title: 'Sample title 1', text: 'Sample text 1') }
     let!(:todo_second) { create(:todo, title: 'Sample title 2', text: 'Sample text 2') }
@@ -72,6 +72,8 @@ RSpec.describe 'Todos', type: :request do
 
   describe 'GET /todos/:id' do
     subject { get "/todos/#{todo.id}" }
+
+    before { travel_to '2019-01-01T00:00:00Z' }
 
     let!(:todo) { create(:todo, title: 'Sample title', text: 'Sample text') }
 
