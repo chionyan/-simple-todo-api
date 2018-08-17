@@ -39,4 +39,31 @@ RSpec.describe 'Todos', type: :request do
       end
     end
   end
+
+  describe 'POST /todos' do
+    subject { post '/todos', params: params }
+
+    let(:params) { { title: 'Sample title', text: 'Sample text' } }
+
+    it 'returns HTTP Status 201' do
+      subject
+      expect(response.status).to eq 201
+    end
+
+    it 'returns input params' do
+      subject
+      result_todo = JSON.parse(response.body)
+
+      aggregate_failures do
+        expect(result_todo['id']).to_not be_empty
+        expect(result_todo['title']).to eq 'Sample title'
+        expect(result_todo['text']).to eq 'Sample text'
+        expect(result_todo['created_at']).to_not be_empty
+      end
+    end
+
+    it 'create 1 todo' do
+      expect { subject }.to change(Todo, :count).by(1)
+    end
+  end
 end
