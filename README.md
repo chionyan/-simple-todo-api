@@ -23,3 +23,4 @@ ref. https://app.swaggerhub.com/apis/kielze/TODO-API/1.0.0/
 
 - [クエリ文字列](https://railsguides.jp/routing.html#%E3%82%AF%E3%82%A8%E3%83%AA%E6%96%87%E5%AD%97%E5%88%97)による検索機能の実装
 - サーバエラー応答(5xx)のエラーハンドリング
+- Request Parameter の Content-Type は `json/application` 以外でも許可することとする
