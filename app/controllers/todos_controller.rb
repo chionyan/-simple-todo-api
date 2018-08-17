@@ -6,7 +6,7 @@ class TodosController < ApplicationController
 
   def create
     todo = Todo.create!(todo_params)
-    render json: todo, status: :created
+    render json: todo, status: :created, location: todo
   end
 
   def show

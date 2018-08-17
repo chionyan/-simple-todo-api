@@ -47,7 +47,10 @@ RSpec.describe 'Todos', type: :request do
 
     it 'returns HTTP Status 201' do
       subject
-      expect(response.status).to eq 201
+      aggregate_failures do
+        expect(response.status).to eq 201
+        expect(response.location).to eq "http://www.example.com/todos/#{Todo.last.id}"
+      end
     end
 
     it 'returns input params' do
