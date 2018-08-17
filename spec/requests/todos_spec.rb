@@ -70,7 +70,7 @@ RSpec.describe 'Todos', type: :request do
     end
   end
 
-  describe 'GET /todos/{todo_id}' do
+  describe 'GET /todos/:id' do
     subject { get "/todos/#{todo.id}" }
 
     let!(:todo) { create(:todo, title: 'Sample title', text: 'Sample text') }
