@@ -66,4 +66,29 @@ RSpec.describe 'Todos', type: :request do
       expect { subject }.to change(Todo, :count).by(1)
     end
   end
+
+  describe 'GET /todos/{todo_id}' do
+    subject { get "/todos/#{todo.id}" }
+
+    let!(:todo) { create(:todo, title: 'Sample title', text: 'Sample text') }
+
+    it 'returns HTTP Status 200' do
+      subject
+      expect(response.status).to eq 200
+    end
+
+    it 'return valid JSON' do
+      expect_todo = {
+        'id' => todo.id,
+        'title' => 'Sample title',
+        'text' => 'Sample text',
+        'created_at' => '2019-01-01T00:00:00Z',
+      }
+
+      subject
+      result_todo = JSON.parse(response.body)
+
+      expect(result_todo).to eq expect_todo
+    end
+  end
 end
