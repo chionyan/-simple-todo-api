@@ -124,4 +124,39 @@ RSpec.describe 'Todos', type: :request do
       expect(result_todo).to eq expect_todo
     end
   end
+
+  describe 'DELETE /todos/:id' do
+    subject { delete path }
+
+    before { travel_to '2019-01-01T00:00:00Z' }
+
+    let!(:todo) { create(:todo, title: 'Sample title', text: 'Sample text') }
+
+    context 'Search Result Matching Criteria' do
+      let(:path) { "/todos/#{todo.id}" }
+
+      it 'returns HTTP Status 200' do
+        subject
+        expect(response.status).to eq 200
+      end
+
+      it 'returns delete JSON' do
+        expect_todo = {
+          'id' => todo.id,
+          'title' => 'Sample title',
+          'text' => 'Sample text',
+          'created_at' => '2019-01-01T00:00:00Z',
+        }
+
+        subject
+        result_todo = JSON.parse(response.body)
+
+        expect(result_todo).to eq expect_todo
+      end
+
+      it 'delete 1 todo' do
+        expect { subject }.to change(Todo, :count).by(-1)
+      end
+    end
+  end
 end
