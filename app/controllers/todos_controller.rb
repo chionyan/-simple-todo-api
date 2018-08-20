@@ -1,4 +1,10 @@
 class TodosController < ApplicationController
+  rescue_from ActiveRecord::RecordNotFound,
+              ActionController::RoutingError do
+    errors = [{ title: '見つかりませんでした。', status: 404 }]
+    render json: { errors: errors }, status: 404
+  end
+
   def index
     todos = Todo.all.order(:created_at)
     render json: todos

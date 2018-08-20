@@ -158,5 +158,30 @@ RSpec.describe 'Todos', type: :request do
         expect { subject }.to change(Todo, :count).by(-1)
       end
     end
+
+    context 'Not Found' do
+      let(:path) { '/todos/0' }
+
+      it 'returns HTTP Status 404' do
+        subject
+        expect(response.status).to eq 404
+      end
+
+      it 'returns error JSON' do
+        expect_errors = {
+          'errors' => [
+            {
+              'title' => '見つかりませんでした。',
+              'status' => 404,
+            },
+          ],
+        }
+
+        subject
+        result_errors = JSON.parse(response.body)
+
+        expect(result_errors).to eq expect_errors
+      end
+    end
   end
 end
