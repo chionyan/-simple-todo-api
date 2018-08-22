@@ -1,5 +1,5 @@
 class TodosController < ApplicationController
-  before_action :set_todo, only: [:show, :update]
+  before_action :set_todo, only: [:show, :update, :destroy]
 
   rescue_from ActiveRecord::RecordNotFound,
               ActionController::RoutingError do
@@ -27,9 +27,8 @@ class TodosController < ApplicationController
   end
 
   def destroy
-    todo = Todo.find(params['id'])
-    todo.destroy!
-    render json: todo
+    @todo.destroy!
+    render json: @todo
   end
 
   private
