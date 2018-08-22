@@ -1,4 +1,6 @@
 class TodosController < ApplicationController
+  before_action :set_todo, only: [:show, :update]
+
   def index
     todos = Todo.all.order(:created_at)
     render json: todos
@@ -10,11 +12,19 @@ class TodosController < ApplicationController
   end
 
   def show
-    todo = Todo.find(params['id'])
-    render json: todo
+    render json: @todo
+  end
+
+  def update
+    @todo.update!(todo_params)
+    render json: @todo, location: @todo
   end
 
   private
+
+  def set_todo
+    @todo = Todo.find(params['id'])
+  end
 
   def todo_params
     params.permit(:title, :text)
