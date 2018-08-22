@@ -1,4 +1,6 @@
 class TodosController < ApplicationController
+  before_action :set_todo, only: [:show, :update]
+
   rescue_from ActiveRecord::RecordNotFound,
               ActionController::RoutingError do
     errors = [{ title: '見つかりませんでした。', status: 404 }]
@@ -16,14 +18,12 @@ class TodosController < ApplicationController
   end
 
   def show
-    todo = Todo.find(params['id'])
-    render json: todo
+    render json: @todo
   end
 
   def update
-    todo = Todo.find(params['id'])
-    todo.update!(todo_params)
-    render json: todo, location: todo
+    @todo.update!(todo_params)
+    render json: @todo, location: @todo
   end
 
   def destroy
@@ -33,6 +33,10 @@ class TodosController < ApplicationController
   end
 
   private
+
+  def set_todo
+    @todo = Todo.find(params['id'])
+  end
 
   def todo_params
     params.permit(:title, :text)
