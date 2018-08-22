@@ -17,7 +17,7 @@ class TodosController < ApplicationController
 
   def update
     @todo.update!(todo_params)
-    render json: @todo, location: @todo
+    render json: @todo
   end
 
   private
