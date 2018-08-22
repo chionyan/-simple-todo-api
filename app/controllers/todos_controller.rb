@@ -1,8 +1,7 @@
 class TodosController < ApplicationController
   before_action :set_todo, only: [:show, :update, :destroy]
 
-  rescue_from ActiveRecord::RecordNotFound,
-              ActionController::RoutingError do
+  rescue_from ActiveRecord::RecordNotFound do
     errors = [{ title: '見つかりませんでした。', status: 404 }]
     render json: { errors: errors }, status: 404
   end
