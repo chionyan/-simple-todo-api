@@ -132,7 +132,7 @@ RSpec.describe 'Todos', type: :request do
 
     let!(:todo) { create(:todo, title: 'Sample title', text: 'Sample text') }
 
-    context 'Search Result Matching Criteria' do
+    context 'Exist Record' do
       let(:path) { "/todos/#{todo.id}" }
 
       it 'returns HTTP Status 200' do
@@ -159,7 +159,7 @@ RSpec.describe 'Todos', type: :request do
       end
     end
 
-    context 'Not Found' do
+    context 'Not Exist Record' do
       let(:path) { '/todos/0' }
 
       it 'returns HTTP Status 404' do
