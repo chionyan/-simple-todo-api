@@ -182,6 +182,10 @@ RSpec.describe 'Todos', type: :request do
 
         expect(result_errors).to eq expect_errors
       end
+
+      it 'not delete todo' do
+        expect { subject }.to_not change(Todo, :count)
+      end
     end
   end
 end
