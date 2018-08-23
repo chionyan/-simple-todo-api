@@ -1,4 +1,5 @@
 ja:
   errors:
     messages:
+      invalid: バリデーションに失敗しました。
       not_found: 見つかりませんでした。
