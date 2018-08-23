@@ -31,7 +31,6 @@ RSpec.describe 'Todos', type: :request do
 
       subject
       result_todos = JSON.parse(response.body)
-
       aggregate_failures do
         expect(result_todos.count).to eq 2
         expect(result_todos[0]).to eq expect_todo_first
@@ -56,7 +55,6 @@ RSpec.describe 'Todos', type: :request do
     it 'returns input params' do
       subject
       result_todo = JSON.parse(response.body)
-
       aggregate_failures do
         expect(result_todo['id']).to_not be_empty
         expect(result_todo['title']).to eq 'Sample title'
@@ -71,57 +69,111 @@ RSpec.describe 'Todos', type: :request do
   end
 
   describe 'GET /todos/:id' do
-    subject { get "/todos/#{todo.id}" }
+    subject { get path }
 
     before { travel_to '2019-01-01T00:00:00Z' }
 
     let!(:todo) { create(:todo, title: 'Sample title', text: 'Sample text') }
 
-    it 'returns HTTP Status 200' do
-      subject
-      expect(response.status).to eq 200
+    context 'Exist Record' do
+      let(:path) { "/todos/#{todo.id}" }
+
+      it 'returns HTTP Status 200' do
+        subject
+        expect(response.status).to eq 200
+      end
+
+      it 'return valid JSON' do
+        expect_todo = {
+          'id' => todo.id,
+          'title' => 'Sample title',
+          'text' => 'Sample text',
+          'created_at' => '2019-01-01T00:00:00Z',
+        }
+
+        subject
+        result_todo = JSON.parse(response.body)
+        expect(result_todo).to eq expect_todo
+      end
     end
 
-    it 'return valid JSON' do
-      expect_todo = {
-        'id' => todo.id,
-        'title' => 'Sample title',
-        'text' => 'Sample text',
-        'created_at' => '2019-01-01T00:00:00Z',
-      }
+    context 'Not Exist Record' do
+      let(:path) { '/todos/0' }
 
-      subject
-      result_todo = JSON.parse(response.body)
+      it 'returns HTTP Status 404' do
+        subject
+        expect(response.status).to eq 404
+      end
 
-      expect(result_todo).to eq expect_todo
+      it 'returns error JSON' do
+        expect_errors = {
+          'errors' => [
+            {
+              'title' => '見つかりませんでした。',
+              'status' => 404,
+            },
+          ],
+        }
+
+        subject
+        result_errors = JSON.parse(response.body)
+        expect(result_errors).to eq expect_errors
+      end
     end
   end
 
   describe 'PATCH /todos/:id' do
-    subject { patch "/todos/#{todo.id}", params: params }
+    subject { patch path, params: params }
 
     before { travel_to '2019-01-01T00:00:00Z' }
 
     let!(:todo) { create(:todo, title: 'Sample title', text: 'Sample text') }
     let(:params) { { title: 'Change title', text: 'Change text' } }
 
-    it 'returns HTTP Status 200' do
-      subject
-      expect(response.status).to eq 200
+    context 'Exist Record' do
+      let(:path) { "/todos/#{todo.id}" }
+
+      it 'returns HTTP Status 200' do
+        subject
+        expect(response.status).to eq 200
+      end
+
+      it 'returns update JSON' do
+        expect_todo = {
+          'id' => todo.id,
+          'title' => 'Change title',
+          'text' => 'Change text',
+          'created_at' => '2019-01-01T00:00:00Z',
+        }
+
+        subject
+        result_todo = JSON.parse(response.body)
+        expect(result_todo).to eq expect_todo
+      end
     end
 
-    it 'returns update JSON' do
-      expect_todo = {
-        'id' => todo.id,
-        'title' => 'Change title',
-        'text' => 'Change text',
-        'created_at' => '2019-01-01T00:00:00Z',
-      }
+    context 'Not Exist Record' do
+      let(:path) { '/todos/0' }
 
-      subject
-      result_todo = JSON.parse(response.body)
+      it 'returns HTTP Status 404' do
+        subject
+        expect(response.status).to eq 404
+      end
 
-      expect(result_todo).to eq expect_todo
+      it 'returns error JSON' do
+        expect_errors = {
+          'errors' => [
+            {
+              'title' => '見つかりませんでした。',
+              'status' => 404,
+            },
+          ],
+        }
+
+        subject
+        result_errors = JSON.parse(response.body)
+        expect(result_errors).to eq expect_errors
+      end
     end
   end
 
@@ -150,7 +202,6 @@ RSpec.describe 'Todos', type: :request do
 
         subject
         result_todo = JSON.parse(response.body)
-
         expect(result_todo).to eq expect_todo
       end
 
@@ -179,7 +230,6 @@ RSpec.describe 'Todos', type: :request do
 
         subject
         result_errors = JSON.parse(response.body)
-
         expect(result_errors).to eq expect_errors
       end
 
