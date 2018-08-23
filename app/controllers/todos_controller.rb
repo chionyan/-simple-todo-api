@@ -6,6 +6,15 @@ class TodosController < ApplicationController
     render json: { errors: errors }, status: 404
   end
 
+  rescue_from ActiveRecord::RecordInvalid do |e|
+    pointers = []
+    e.record.errors.messages.keys.each do |attribute|
+      pointers << "/data/attributes/#{attribute}"
+    end
+    errors = [{ title: I18n.t('errors.messages.invalid', locale: 'ja'), status: 422, source: { 'pointer' => pointers } }]
+    render json: { errors: errors }, status: 422
+  end
+
   def index
     todos = Todo.all.order(:created_at)
     render json: todos
