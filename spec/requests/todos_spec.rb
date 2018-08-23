@@ -9,33 +9,60 @@ RSpec.describe 'Todos', type: :request do
     let!(:todo_first) { create(:todo, title: 'Sample title 1', text: 'Sample text 1') }
     let!(:todo_second) { create(:todo, title: 'Sample title 2', text: 'Sample text 2') }
 
-    it 'returns HTTP Status 200' do
-      subject
-      expect(response.status).to eq 200
+    context 'Normal Request' do
+      it 'returns HTTP Status 200' do
+        subject
+        expect(response.status).to eq 200
+      end
+
+      it 'return valid JSON' do
+        expect_todo_first = {
+          'id' => todo_first.id,
+          'title' => 'Sample title 1',
+          'text' => 'Sample text 1',
+          'created_at' => '2019-01-01T00:00:00Z',
+        }
+
+        expect_todo_second = {
+          'id' => todo_second.id,
+          'title' => 'Sample title 2',
+          'text' => 'Sample text 2',
+          'created_at' => '2019-01-01T00:00:00Z',
+        }
+
+        subject
+        result_todos = JSON.parse(response.body)
+        aggregate_failures do
+          expect(result_todos.count).to eq 2
+          expect(result_todos[0]).to eq expect_todo_first
+          expect(result_todos[1]).to eq expect_todo_second
+        end
+      end
     end
 
-    it 'return valid JSON' do
-      expect_todo_first = {
-        'id' => todo_first.id,
-        'title' => 'Sample title 1',
-        'text' => 'Sample text 1',
-        'created_at' => '2019-01-01T00:00:00Z',
-      }
+    context 'Bad Request' do
+      before do
+        allow(Todo).to receive(:all).and_raise(ActionController::BadRequest)
+      end
 
-      expect_todo_second = {
-        'id' => todo_second.id,
-        'title' => 'Sample title 2',
-        'text' => 'Sample text 2',
-        'created_at' => '2019-01-01T00:00:00Z',
-      }
+      it 'returns HTTP Status 400' do
+        subject
+        expect(response.status).to eq 400
+      end
 
-      subject
-      result_todos = JSON.parse(response.body)
+      it 'return error JSON' do
+        expect_errors = {
+          'errors' => [
+            {
+              'title' => '不正なリクエストです。',
+              'status' => 400,
+            },
+          ],
+        }
 
-      aggregate_failures do
-        expect(result_todos.count).to eq 2
-        expect(result_todos[0]).to eq expect_todo_first
-        expect(result_todos[1]).to eq expect_todo_second
+        subject
+        result_errors = JSON.parse(response.body)
+        expect(result_errors).to eq expect_errors
       end
     end
   end
