@@ -6,7 +6,7 @@
 
 ## API 仕様
 
-ref. https://app.swaggerhub.com/apis/kielze/TODO-API/1.0.0/
+ref. https://app.swaggerhub.com/apis/sukechannnn/TODO-API/1.0.0/
 
 ## オブジェクトのデータ構造
 
