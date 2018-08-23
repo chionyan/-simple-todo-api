@@ -124,4 +124,68 @@ RSpec.describe 'Todos', type: :request do
       expect(result_todo).to eq expect_todo
     end
   end
+
+  describe 'DELETE /todos/:id' do
+    subject { delete path }
+
+    before { travel_to '2019-01-01T00:00:00Z' }
+
+    let!(:todo) { create(:todo, title: 'Sample title', text: 'Sample text') }
+
+    context 'Exist Record' do
+      let(:path) { "/todos/#{todo.id}" }
+
+      it 'returns HTTP Status 200' do
+        subject
+        expect(response.status).to eq 200
+      end
+
+      it 'returns delete JSON' do
+        expect_todo = {
+          'id' => todo.id,
+          'title' => 'Sample title',
+          'text' => 'Sample text',
+          'created_at' => '2019-01-01T00:00:00Z',
+        }
+
+        subject
+        result_todo = JSON.parse(response.body)
+
+        expect(result_todo).to eq expect_todo
+      end
+
+      it 'delete 1 todo' do
+        expect { subject }.to change(Todo, :count).by(-1)
+      end
+    end
+
+    context 'Not Exist Record' do
+      let(:path) { '/todos/0' }
+
+      it 'returns HTTP Status 404' do
+        subject
+        expect(response.status).to eq 404
+      end
+
+      it 'returns error JSON' do
+        expect_errors = {
+          'errors' => [
+            {
+              'title' => '見つかりませんでした。',
+              'status' => 404,
+            },
+          ],
+        }
+
+        subject
+        result_errors = JSON.parse(response.body)
+
+        expect(result_errors).to eq expect_errors
+      end
+
+      it 'not delete todo' do
+        expect { subject }.to_not change(Todo, :count)
+      end
+    end
+  end
 end

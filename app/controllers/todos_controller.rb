@@ -1,5 +1,10 @@
 class TodosController < ApplicationController
-  before_action :set_todo, only: [:show, :update]
+  before_action :set_todo, only: [:show, :update, :destroy]
+
+  rescue_from ActiveRecord::RecordNotFound do
+    errors = [{ title: I18n.t('errors.messages.not_found', locale: 'ja'), status: 404 }]
+    render json: { errors: errors }, status: 404
+  end
 
   def index
     todos = Todo.all.order(:created_at)
@@ -17,6 +22,11 @@ class TodosController < ApplicationController
 
   def update
     @todo.update!(todo_params)
+    render json: @todo
+  end
+
+  def destroy
+    @todo.destroy!
     render json: @todo
   end
 
