@@ -1,4 +1,6 @@
 ja:
   errors:
     messages:
+      bad_request: 不正なリクエストです。
+      invalid: バリデーションに失敗しました。
       not_found: 見つかりませんでした。

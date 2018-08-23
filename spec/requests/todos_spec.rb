@@ -9,33 +9,60 @@ RSpec.describe 'Todos', type: :request do
     let!(:todo_first) { create(:todo, title: 'Sample title 1', text: 'Sample text 1') }
     let!(:todo_second) { create(:todo, title: 'Sample title 2', text: 'Sample text 2') }
 
-    it 'returns HTTP Status 200' do
-      subject
-      expect(response.status).to eq 200
+    context 'Normal Request' do
+      it 'returns HTTP Status 200' do
+        subject
+        expect(response.status).to eq 200
+      end
+
+      it 'return valid JSON' do
+        expect_todo_first = {
+          'id' => todo_first.id,
+          'title' => 'Sample title 1',
+          'text' => 'Sample text 1',
+          'created_at' => '2019-01-01T00:00:00Z',
+        }
+
+        expect_todo_second = {
+          'id' => todo_second.id,
+          'title' => 'Sample title 2',
+          'text' => 'Sample text 2',
+          'created_at' => '2019-01-01T00:00:00Z',
+        }
+
+        subject
+        result_todos = JSON.parse(response.body)
+        aggregate_failures do
+          expect(result_todos.count).to eq 2
+          expect(result_todos[0]).to eq expect_todo_first
+          expect(result_todos[1]).to eq expect_todo_second
+        end
+      end
     end
 
-    it 'return valid JSON' do
-      expect_todo_first = {
-        'id' => todo_first.id,
-        'title' => 'Sample title 1',
-        'text' => 'Sample text 1',
-        'created_at' => '2019-01-01T00:00:00Z',
-      }
+    context 'Bad Request' do
+      before do
+        allow(Todo).to receive(:all).and_raise(ActionController::BadRequest)
+      end
 
-      expect_todo_second = {
-        'id' => todo_second.id,
-        'title' => 'Sample title 2',
-        'text' => 'Sample text 2',
-        'created_at' => '2019-01-01T00:00:00Z',
-      }
+      it 'returns HTTP Status 400' do
+        subject
+        expect(response.status).to eq 400
+      end
 
-      subject
-      result_todos = JSON.parse(response.body)
+      it 'return error JSON' do
+        expect_errors = {
+          'errors' => [
+            {
+              'title' => '不正なリクエストです。',
+              'status' => 400,
+            },
+          ],
+        }
 
-      aggregate_failures do
-        expect(result_todos.count).to eq 2
-        expect(result_todos[0]).to eq expect_todo_first
-        expect(result_todos[1]).to eq expect_todo_second
+        subject
+        result_errors = JSON.parse(response.body)
+        expect(result_errors).to eq expect_errors
       end
     end
   end
@@ -43,85 +70,332 @@ RSpec.describe 'Todos', type: :request do
   describe 'POST /todos' do
     subject { post '/todos', params: params }
 
-    let(:params) { { title: 'Sample title', text: 'Sample text' } }
+    context 'Valid params' do
+      let(:params) { { title: 'Sample title', text: 'Sample text' } }
 
-    it 'returns HTTP Status 201' do
-      subject
-      aggregate_failures do
-        expect(response.status).to eq 201
-        expect(response.location).to eq "http://www.example.com/todos/#{Todo.last.id}"
+      it 'returns HTTP Status 201' do
+        subject
+        aggregate_failures do
+          expect(response.status).to eq 201
+          expect(response.location).to eq "http://www.example.com/todos/#{Todo.last.id}"
+        end
+      end
+
+      it 'returns input params' do
+        subject
+        result_todo = JSON.parse(response.body)
+        aggregate_failures do
+          expect(result_todo['id']).to_not be_empty
+          expect(result_todo['title']).to eq 'Sample title'
+          expect(result_todo['text']).to eq 'Sample text'
+          expect(result_todo['created_at']).to_not be_empty
+        end
+      end
+
+      it 'create 1 todo' do
+        expect { subject }.to change(Todo, :count).by(1)
       end
     end
 
-    it 'returns input params' do
-      subject
-      result_todo = JSON.parse(response.body)
+    context 'Invalid params' do
+      context 'Empty title & text' do
+        let(:params) { { title: '', text: '' } }
 
-      aggregate_failures do
-        expect(result_todo['id']).to_not be_empty
-        expect(result_todo['title']).to eq 'Sample title'
-        expect(result_todo['text']).to eq 'Sample text'
-        expect(result_todo['created_at']).to_not be_empty
+        it 'returns HTTP Status 422' do
+          subject
+          expect(response.status).to eq 422
+        end
+
+        it 'returns error JSON' do
+          expect_errors = {
+            'errors' => [
+              {
+                'title' => 'バリデーションに失敗しました。',
+                'status' => 422,
+                'source' => { 'pointer' => ['/data/attributes/title', '/data/attributes/text'] },
+              },
+            ],
+          }
+
+          subject
+          result_errors = JSON.parse(response.body)
+          expect(result_errors).to eq expect_errors
+        end
+
+        it 'not create todo' do
+          expect { subject }.to_not change(Todo, :count)
+        end
       end
-    end
 
-    it 'create 1 todo' do
-      expect { subject }.to change(Todo, :count).by(1)
+      context 'Empty title' do
+        let(:params) { { title: '', text: 'Sample text' } }
+
+        it 'returns HTTP Status 422' do
+          subject
+          expect(response.status).to eq 422
+        end
+
+        it 'returns error JSON' do
+          expect_errors = {
+            'errors' => [
+              {
+                'title' => 'バリデーションに失敗しました。',
+                'status' => 422,
+                'source' => { 'pointer' => ['/data/attributes/title'] },
+              },
+            ],
+          }
+
+          subject
+          result_errors = JSON.parse(response.body)
+          expect(result_errors).to eq expect_errors
+        end
+
+        it 'not create todo' do
+          expect { subject }.to_not change(Todo, :count)
+        end
+      end
+
+      context 'Empty text' do
+        let(:params) { { title: 'Sample text', text: '' } }
+
+        it 'returns HTTP Status 422' do
+          subject
+          expect(response.status).to eq 422
+        end
+
+        it 'returns error JSON' do
+          expect_errors = {
+            'errors' => [
+              {
+                'title' => 'バリデーションに失敗しました。',
+                'status' => 422,
+                'source' => { 'pointer' => ['/data/attributes/text'] },
+              },
+            ],
+          }
+
+          subject
+          result_errors = JSON.parse(response.body)
+          expect(result_errors).to eq expect_errors
+        end
+
+        it 'not create todo' do
+          expect { subject }.to_not change(Todo, :count)
+        end
+      end
     end
   end
 
   describe 'GET /todos/:id' do
-    subject { get "/todos/#{todo.id}" }
+    subject { get path }
 
     before { travel_to '2019-01-01T00:00:00Z' }
 
     let!(:todo) { create(:todo, title: 'Sample title', text: 'Sample text') }
 
-    it 'returns HTTP Status 200' do
-      subject
-      expect(response.status).to eq 200
+    context 'Exist Record' do
+      let(:path) { "/todos/#{todo.id}" }
+
+      it 'returns HTTP Status 200' do
+        subject
+        expect(response.status).to eq 200
+      end
+
+      it 'return valid JSON' do
+        expect_todo = {
+          'id' => todo.id,
+          'title' => 'Sample title',
+          'text' => 'Sample text',
+          'created_at' => '2019-01-01T00:00:00Z',
+        }
+
+        subject
+        result_todo = JSON.parse(response.body)
+        expect(result_todo).to eq expect_todo
+      end
     end
 
-    it 'return valid JSON' do
-      expect_todo = {
-        'id' => todo.id,
-        'title' => 'Sample title',
-        'text' => 'Sample text',
-        'created_at' => '2019-01-01T00:00:00Z',
-      }
+    context 'Not Exist Record' do
+      let(:path) { '/todos/0' }
 
-      subject
-      result_todo = JSON.parse(response.body)
+      it 'returns HTTP Status 404' do
+        subject
+        expect(response.status).to eq 404
+      end
 
-      expect(result_todo).to eq expect_todo
+      it 'returns error JSON' do
+        expect_errors = {
+          'errors' => [
+            {
+              'title' => '見つかりませんでした。',
+              'status' => 404,
+            },
+          ],
+        }
+
+        subject
+        result_errors = JSON.parse(response.body)
+        expect(result_errors).to eq expect_errors
+      end
     end
   end
 
   describe 'PATCH /todos/:id' do
-    subject { patch "/todos/#{todo.id}", params: params }
+    subject { patch path, params: params }
 
     before { travel_to '2019-01-01T00:00:00Z' }
 
     let!(:todo) { create(:todo, title: 'Sample title', text: 'Sample text') }
     let(:params) { { title: 'Change title', text: 'Change text' } }
 
-    it 'returns HTTP Status 200' do
-      subject
-      expect(response.status).to eq 200
+    context 'Exist Record' do
+      let(:path) { "/todos/#{todo.id}" }
+
+      context 'Valid params' do
+        it 'returns HTTP Status 200' do
+          subject
+          expect(response.status).to eq 200
+        end
+
+        it 'returns update JSON' do
+          expect_todo = {
+            'id' => todo.id,
+            'title' => 'Change title',
+            'text' => 'Change text',
+            'created_at' => '2019-01-01T00:00:00Z',
+          }
+
+          subject
+          result_todo = JSON.parse(response.body)
+          expect(result_todo).to eq expect_todo
+        end
+      end
+
+      context 'Invalid params' do
+        context 'Empty title & text' do
+          let(:params) { { title: '', text: '' } }
+
+          it 'returns HTTP Status 422' do
+            subject
+            expect(response.status).to eq 422
+          end
+
+          it 'returns error JSON' do
+            expect_errors = {
+              'errors' => [
+                {
+                  'title' => 'バリデーションに失敗しました。',
+                  'status' => 422,
+                  'source' => { 'pointer' => ['/data/attributes/title', '/data/attributes/text'] },
+                },
+              ],
+            }
+
+            subject
+            result_errors = JSON.parse(response.body)
+            expect(result_errors).to eq expect_errors
+          end
+
+          it 'not change params' do
+            subject
+            aggregate_failures do
+              expect(todo.title).to eq 'Sample title'
+              expect(todo.text).to eq 'Sample text'
+            end
+          end
+        end
+
+        context 'Empty title' do
+          let(:params) { { title: '', text: 'Sample text' } }
+
+          it 'returns HTTP Status 422' do
+            subject
+            expect(response.status).to eq 422
+          end
+
+          it 'returns error JSON' do
+            expect_errors = {
+              'errors' => [
+                {
+                  'title' => 'バリデーションに失敗しました。',
+                  'status' => 422,
+                  'source' => { 'pointer' => ['/data/attributes/title'] },
+                },
+              ],
+            }
+
+            subject
+            result_errors = JSON.parse(response.body)
+            expect(result_errors).to eq expect_errors
+          end
+
+          it 'not change params' do
+            subject
+            aggregate_failures do
+              expect(todo.title).to eq 'Sample title'
+              expect(todo.text).to eq 'Sample text'
+            end
+          end
+        end
+
+        context 'Empty text' do
+          let(:params) { { title: 'Sample text', text: '' } }
+
+          it 'returns HTTP Status 422' do
+            subject
+            expect(response.status).to eq 422
+          end
+
+          it 'returns error JSON' do
+            expect_errors = {
+              'errors' => [
+                {
+                  'title' => 'バリデーションに失敗しました。',
+                  'status' => 422,
+                  'source' => { 'pointer' => ['/data/attributes/text'] },
+                },
+              ],
+            }
+
+            subject
+            result_errors = JSON.parse(response.body)
+            expect(result_errors).to eq expect_errors
+          end
+
+          it 'not change params' do
+            subject
+            aggregate_failures do
+              expect(todo.title).to eq 'Sample title'
+              expect(todo.text).to eq 'Sample text'
+            end
+          end
+        end
+      end
     end
 
-    it 'returns update JSON' do
-      expect_todo = {
-        'id' => todo.id,
-        'title' => 'Change title',
-        'text' => 'Change text',
-        'created_at' => '2019-01-01T00:00:00Z',
-      }
+    context 'Not Exist Record' do
+      let(:path) { '/todos/0' }
 
-      subject
-      result_todo = JSON.parse(response.body)
+      it 'returns HTTP Status 404' do
+        subject
+        expect(response.status).to eq 404
+      end
 
-      expect(result_todo).to eq expect_todo
+      it 'returns error JSON' do
+        expect_errors = {
+          'errors' => [
+            {
+              'title' => '見つかりませんでした。',
+              'status' => 404,
+            },
+          ],
+        }
+
+        subject
+        result_errors = JSON.parse(response.body)
+        expect(result_errors).to eq expect_errors
+      end
     end
   end
 
@@ -150,7 +424,6 @@ RSpec.describe 'Todos', type: :request do
 
         subject
         result_todo = JSON.parse(response.body)
-
         expect(result_todo).to eq expect_todo
       end
 
@@ -179,7 +452,6 @@ RSpec.describe 'Todos', type: :request do
 
         subject
         result_errors = JSON.parse(response.body)
-
         expect(result_errors).to eq expect_errors
       end
 

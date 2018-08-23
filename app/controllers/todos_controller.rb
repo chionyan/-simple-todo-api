@@ -1,9 +1,23 @@
 class TodosController < ApplicationController
   before_action :set_todo, only: [:show, :update, :destroy]
 
+  rescue_from ActionController::BadRequest do
+    errors = [{ title: I18n.t('errors.messages.bad_request', locale: 'ja'), status: 400 }]
+    render json: { errors: errors }, status: 400
+  end
+
   rescue_from ActiveRecord::RecordNotFound do
     errors = [{ title: I18n.t('errors.messages.not_found', locale: 'ja'), status: 404 }]
     render json: { errors: errors }, status: 404
+  end
+
+  rescue_from ActiveRecord::RecordInvalid do |e|
+    pointers = []
+    e.record.errors.messages.keys.each do |attribute|
+      pointers << "/data/attributes/#{attribute}"
+    end
+    errors = [{ title: I18n.t('errors.messages.invalid', locale: 'ja'), status: 422, source: { 'pointer' => pointers } }]
+    render json: { errors: errors }, status: 422
   end
 
   def index
