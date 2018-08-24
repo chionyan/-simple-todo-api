@@ -1,4 +1,5 @@
 ja:
   errors:
     messages:
+      bad_request: 不正なリクエストです。
       not_found: 見つかりませんでした。

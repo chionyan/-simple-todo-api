@@ -1,6 +1,11 @@
 class TodosController < ApplicationController
   before_action :set_todo, only: [:show, :update, :destroy]
 
+  rescue_from ActionController::BadRequest do
+    errors = [{ title: I18n.t('errors.messages.bad_request', locale: 'ja'), status: 400 }]
+    render json: { errors: errors }, status: 400
+  end
+
   rescue_from ActiveRecord::RecordNotFound do
     errors = [{ title: I18n.t('errors.messages.not_found', locale: 'ja'), status: 404 }]
     render json: { errors: errors }, status: 404
