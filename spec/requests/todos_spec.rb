@@ -69,14 +69,12 @@ RSpec.describe 'Todos', type: :request do
   end
 
   describe 'GET /todos/:id' do
-    subject { get path }
-
     before { travel_to '2019-01-01T00:00:00Z' }
 
     let!(:todo) { create(:todo, title: 'Sample title', text: 'Sample text') }
 
     context 'Exist Record' do
-      let(:path) { "/todos/#{todo.id}" }
+      subject { get "/todos/#{todo.id}" }
 
       it 'returns HTTP Status 200' do
         subject
@@ -98,7 +96,7 @@ RSpec.describe 'Todos', type: :request do
     end
 
     context 'Not Exist Record' do
-      let(:path) { '/todos/0' }
+      subject { get '/todos/0' }
 
       it 'returns HTTP Status 404' do
         subject
@@ -123,15 +121,13 @@ RSpec.describe 'Todos', type: :request do
   end
 
   describe 'PATCH /todos/:id' do
-    subject { patch path, params: params }
-
     before { travel_to '2019-01-01T00:00:00Z' }
 
     let!(:todo) { create(:todo, title: 'Sample title', text: 'Sample text') }
     let(:params) { { title: 'Change title', text: 'Change text' } }
 
     context 'Exist Record' do
-      let(:path) { "/todos/#{todo.id}" }
+      subject { patch "/todos/#{todo.id}", params: params }
 
       it 'returns HTTP Status 200' do
         subject
@@ -153,7 +149,7 @@ RSpec.describe 'Todos', type: :request do
     end
 
     context 'Not Exist Record' do
-      let(:path) { '/todos/0' }
+      subject { patch '/todos/0', params: params }
 
       it 'returns HTTP Status 404' do
         subject
@@ -178,14 +174,12 @@ RSpec.describe 'Todos', type: :request do
   end
 
   describe 'DELETE /todos/:id' do
-    subject { delete path }
-
     before { travel_to '2019-01-01T00:00:00Z' }
 
     let!(:todo) { create(:todo, title: 'Sample title', text: 'Sample text') }
 
     context 'Exist Record' do
-      let(:path) { "/todos/#{todo.id}" }
+      subject { delete "/todos/#{todo.id}" }
 
       it 'returns HTTP Status 200' do
         subject
@@ -211,7 +205,7 @@ RSpec.describe 'Todos', type: :request do
     end
 
     context 'Not Exist Record' do
-      let(:path) { '/todos/0' }
+      subject { delete '/todos/0' }
 
       it 'returns HTTP Status 404' do
         subject
