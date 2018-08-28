@@ -84,7 +84,12 @@ RSpec.describe 'Todos', type: :request do
               {
                 'title' => 'バリデーションに失敗しました。',
                 'status' => 422,
-                'source' => { 'pointer' => ['/data/attributes/title', '/data/attributes/text'] },
+                'source' => { 'pointer' => '/title' },
+              },
+              {
+                'title' => 'バリデーションに失敗しました。',
+                'status' => 422,
+                'source' => { 'pointer' => '/text' },
               },
             ],
           }
@@ -113,7 +118,7 @@ RSpec.describe 'Todos', type: :request do
               {
                 'title' => 'バリデーションに失敗しました。',
                 'status' => 422,
-                'source' => { 'pointer' => ['/data/attributes/title'] },
+                'source' => { 'pointer' => '/title' },
               },
             ],
           }
@@ -142,7 +147,7 @@ RSpec.describe 'Todos', type: :request do
               {
                 'title' => 'バリデーションに失敗しました。',
                 'status' => 422,
-                'source' => { 'pointer' => ['/data/attributes/text'] },
+                'source' => { 'pointer' => '/text' },
               },
             ],
           }
@@ -255,7 +260,12 @@ RSpec.describe 'Todos', type: :request do
                 {
                   'title' => 'バリデーションに失敗しました。',
                   'status' => 422,
-                  'source' => { 'pointer' => ['/data/attributes/title', '/data/attributes/text'] },
+                  'source' => { 'pointer' => '/title' },
+                },
+                {
+                  'title' => 'バリデーションに失敗しました。',
+                  'status' => 422,
+                  'source' => { 'pointer' => '/text' },
                 },
               ],
             }
@@ -288,7 +298,7 @@ RSpec.describe 'Todos', type: :request do
                 {
                   'title' => 'バリデーションに失敗しました。',
                   'status' => 422,
-                  'source' => { 'pointer' => ['/data/attributes/title'] },
+                  'source' => { 'pointer' => '/title' },
                 },
               ],
             }
@@ -321,7 +331,7 @@ RSpec.describe 'Todos', type: :request do
                 {
                   'title' => 'バリデーションに失敗しました。',
                   'status' => 422,
-                  'source' => { 'pointer' => ['/data/attributes/text'] },
+                  'source' => { 'pointer' => '/text' },
                 },
               ],
             }

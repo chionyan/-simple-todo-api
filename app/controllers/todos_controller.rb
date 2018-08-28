@@ -7,11 +7,11 @@ class TodosController < ApplicationController
   end
 
   rescue_from ActiveRecord::RecordInvalid do |e|
-    pointers = []
+    errors = []
     e.record.errors.messages.keys.each do |attribute|
-      pointers << "/data/attributes/#{attribute}"
+      error = { title: I18n.t('errors.messages.invalid', locale: 'ja'), status: 422, source: { 'pointer' => "/#{attribute}" } }
+      errors << error
     end
-    errors = [{ title: I18n.t('errors.messages.invalid', locale: 'ja'), status: 422, source: { 'pointer' => pointers } }]
     render json: { errors: errors }, status: 422
   end
 
