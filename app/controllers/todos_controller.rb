@@ -7,10 +7,13 @@ class TodosController < ApplicationController
   end
 
   rescue_from ActiveRecord::RecordInvalid do |e|
-    errors = []
-    e.record.errors.messages.keys.each do |attribute|
-      error = { title: I18n.t('errors.messages.invalid', locale: 'ja'), status: 422, source: { 'pointer' => "/#{attribute}" } }
-      errors << error
+    errors = e.record.errors.messages.keys
+    errors.map! do |attribute|
+      {
+        title: i18n_todo_attribute(attribute) + i18n_errors_messages('invalid'),
+        status: 422,
+        source: { pointer: "/#{attribute}" },
+      }
     end
     render json: { errors: errors }, status: 422
   end
@@ -47,5 +50,13 @@ class TodosController < ApplicationController
 
   def todo_params
     params.permit(:title, :text)
+  end
+
+  def i18n_todo_attribute(attribute_name)
+    I18n.t(attribute_name, scope: 'activerecord.attributes.todo', locale: 'ja')
+  end
+
+  def i18n_errors_messages(error_name)
+    I18n.t(error_name, scope: 'errors.messages', locale: 'ja')
   end
 end
