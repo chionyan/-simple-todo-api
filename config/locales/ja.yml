@@ -1,14 +1,13 @@
 ja:
   activerecord:
-      models:
-        todo: Todo
-      attributes:
-        todo:
-          id: ID
-          title: タイトル
-          text: テキスト
-          created_at: 作成日時
+    models:
+      todo: Todo
+    attributes:
+      todo:
+        id: ID
+        title: タイトル
+        text: テキスト
+        created_at: 作成日時
   errors:
     messages:
-      invalid: のバリデーションに失敗しました。
       not_found: 見つかりませんでした。
