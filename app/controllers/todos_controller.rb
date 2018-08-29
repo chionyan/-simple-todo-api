@@ -4,7 +4,7 @@ class TodosController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound do
     errors = [
       {
-        title: i18n_errors_messages('not_found'),
+        title: I18n.t('not_found', scope: 'errors.messages'),
         status: 404,
       },
     ]
@@ -12,14 +12,15 @@ class TodosController < ApplicationController
   end
 
   rescue_from ActiveRecord::RecordInvalid do |e|
-    errors = e.record.errors.messages.keys
-    errors.map! do |attribute|
-      {
-        title: i18n_todo_attribute(attribute) + i18n_errors_messages('invalid'),
-        status: 422,
-        source: { pointer: "/#{attribute}" },
-      }
-    end
+    errors =
+      e.record.errors.keys.map.with_index do |attribute, i|
+        {
+          title: e.record.errors.full_messages[i],
+          status: 422,
+          source: { pointer: "/#{attribute}" },
+        }
+      end
+
     render json: { errors: errors }, status: 422
   end
 
@@ -55,13 +56,5 @@ class TodosController < ApplicationController
 
   def todo_params
     params.permit(:title, :text)
-  end
-
-  def i18n_todo_attribute(attribute_name)
-    I18n.t(attribute_name, scope: 'activerecord.attributes.todo', locale: 'ja')
-  end
-
-  def i18n_errors_messages(error_name)
-    I18n.t(error_name, scope: 'errors.messages', locale: 'ja')
   end
 end

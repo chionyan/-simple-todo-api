@@ -82,12 +82,12 @@ RSpec.describe 'Todos', type: :request do
           expect_errors = {
             'errors' => [
               {
-                'title' => 'タイトルのバリデーションに失敗しました。',
+                'title' => 'タイトルを入力してください',
                 'status' => 422,
                 'source' => { 'pointer' => '/title' },
               },
               {
-                'title' => 'テキストのバリデーションに失敗しました。',
+                'title' => 'テキストを入力してください',
                 'status' => 422,
                 'source' => { 'pointer' => '/text' },
               },
@@ -116,7 +116,7 @@ RSpec.describe 'Todos', type: :request do
           expect_errors = {
             'errors' => [
               {
-                'title' => 'タイトルのバリデーションに失敗しました。',
+                'title' => 'タイトルを入力してください',
                 'status' => 422,
                 'source' => { 'pointer' => '/title' },
               },
@@ -145,7 +145,7 @@ RSpec.describe 'Todos', type: :request do
           expect_errors = {
             'errors' => [
               {
-                'title' => 'テキストのバリデーションに失敗しました。',
+                'title' => 'テキストを入力してください',
                 'status' => 422,
                 'source' => { 'pointer' => '/text' },
               },
@@ -258,12 +258,12 @@ RSpec.describe 'Todos', type: :request do
             expect_errors = {
               'errors' => [
                 {
-                  'title' => 'タイトルのバリデーションに失敗しました。',
+                  'title' => 'タイトルを入力してください',
                   'status' => 422,
                   'source' => { 'pointer' => '/title' },
                 },
                 {
-                  'title' => 'テキストのバリデーションに失敗しました。',
+                  'title' => 'テキストを入力してください',
                   'status' => 422,
                   'source' => { 'pointer' => '/text' },
                 },
@@ -296,7 +296,7 @@ RSpec.describe 'Todos', type: :request do
             expect_errors = {
               'errors' => [
                 {
-                  'title' => 'タイトルのバリデーションに失敗しました。',
+                  'title' => 'タイトルを入力してください',
                   'status' => 422,
                   'source' => { 'pointer' => '/title' },
                 },
@@ -329,7 +329,7 @@ RSpec.describe 'Todos', type: :request do
             expect_errors = {
               'errors' => [
                 {
-                  'title' => 'テキストのバリデーションに失敗しました。',
+                  'title' => 'テキストを入力してください',
                   'status' => 422,
                   'source' => { 'pointer' => '/text' },
                 },
