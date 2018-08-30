@@ -2,8 +2,28 @@ class TodosController < ApplicationController
   before_action :set_todo, only: [:show, :update, :destroy]
 
   rescue_from ActiveRecord::RecordNotFound do
-    errors = [{ title: I18n.t('errors.messages.not_found', locale: 'ja'), status: 404 }]
+    errors = [
+      {
+        title: I18n.t('not_found', scope: 'errors.messages'),
+        status: 404,
+      },
+    ]
     render json: { errors: errors }, status: 404
+  end
+
+  rescue_from ActiveRecord::RecordInvalid do |e|
+    errors =
+      e.record.errors.keys.map do |attribute|
+        e.record.errors.full_messages_for(attribute).map do |msg|
+          {
+            title: msg,
+            status: 422,
+            source: { pointer: "/#{attribute}" },
+          }
+        end
+      end.flatten
+
+    render json: { errors: errors }, status: 422
   end
 
   def index
