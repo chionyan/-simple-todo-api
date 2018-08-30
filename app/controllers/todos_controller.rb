@@ -13,13 +13,15 @@ class TodosController < ApplicationController
 
   rescue_from ActiveRecord::RecordInvalid do |e|
     errors =
-      e.record.errors.keys.map.with_index do |attribute, i|
-        {
-          title: e.record.errors.full_messages[i],
-          status: 422,
-          source: { pointer: "/#{attribute}" },
-        }
-      end
+      e.record.errors.keys.map do |attribute|
+        e.record.errors.full_messages_for(attribute).map do |msg|
+          {
+            title: msg,
+            status: 422,
+            source: { pointer: "/#{attribute}" },
+          }
+        end
+      end.flatten
 
     render json: { errors: errors }, status: 422
   end
